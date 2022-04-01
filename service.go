@@ -64,14 +64,8 @@ func transferMoney(sourceAccountHolderUserName string, destinationAccountHolderU
 	}
 	var valueSourceFloat int
 	var valueDestinationFloat int
-	valueSourceFloat, statusSource = strconv.Atoi(valueSource)
-	if statusSource != nil {
-		log.Printf("Error converting source %v: %v\n", path+"datastore/"+sourceAccountHolderUserName, statusSource)
-	}
-	valueDestinationFloat, statusDestination = strconv.Atoi(valueDestination)
-	if statusSource != nil {
-		log.Printf("Error converting destination %v: %v\n", path+"datastore/"+destinationAccountHolderUserName, statusDestination)
-	}
+	valueSourceFloat, _ = strconv.Atoi(valueSource)
+	valueDestinationFloat, _ = strconv.Atoi(valueDestination)
 	var transferAmountFloat int
 	transferAmountFloat, _ = strconv.Atoi(transferAmount)
 	if valueSourceFloat < transferAmountFloat {
