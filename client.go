@@ -3,6 +3,7 @@ package main
 import (
 	"ethos/altEthos"
 	"ethos/defined"
+	"ethos/kernelTypes"
 	"ethos/syscall"
 	"log"
 )
@@ -59,6 +60,22 @@ func ipcCall(call defined.Rpc) {
 	if status != syscall.StatusOk {
 		log.Printf("Client call failed: %v\n", status)
 		altEthos.Exit(status)
+	}
+}
+
+func EthosSTDIN() kernelTypes.String {
+	var input kernelTypes.String
+	status := altEthos.ReadStream(syscall.Stdin, &input)
+	if status != syscall.StatusOk {
+		log.Printf("Error while reading syscall.Stdin: %v\n", status)
+	}
+	return input
+}
+
+func EthosSTDOUT(prompt kernelTypes.String) {
+	status := altEthos.WriteStream(syscall.Stdout, &prompt)
+	if status != syscall.StatusOk {
+		log.Printf("Error writing to syscall.Stdout: %v\n", status)
 	}
 }
 
