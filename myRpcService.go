@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-var path = "/user/" + altEthos.GetUser() + "/server/"
+var path = "/home/me/EthosTransactionalRPC/server/"
 var eventFd = make(map[syscall.EventId]syscall.Fd)
 
 func init() {
@@ -112,9 +112,9 @@ func CustomHandleImport(eventInfo altEthos.ImportEventInfo) {
 }
 
 func main() {
-	var pathService = altEthos.IsDirectory("/user/" + altEthos.GetUser() + "/server/")
-	var pathClient = altEthos.IsDirectory("/user/" + altEthos.GetUser() + "/client/")
-	var pathDatastore = altEthos.IsDirectory("/user/" + altEthos.GetUser() + "/datastore/")
+	var pathService = altEthos.IsDirectory(path)
+	var pathClient = altEthos.IsDirectory("/home/me/EthosTransactionalRPC/client/")
+	var pathDatastore = altEthos.IsDirectory("/home/me/EthosTransactionalRPC/server/datastore/")
 	var pathType kernelTypes.String
 	var checkPathService = altEthos.LogToDirectory(pathService)
 	if checkPathService == false {
