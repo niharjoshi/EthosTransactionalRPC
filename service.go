@@ -64,8 +64,8 @@ func transferMoney(sourceAccountHolderUserName string, destinationAccountHolderU
 	}
 	var valueSourceFloat int
 	var valueDestinationFloat int
-	valueSourceFloat, _ = strconv.Atoi(valueSource)
-	valueDestinationFloat, _ = strconv.Atoi(valueDestination)
+	valueSourceFloat, _ = strconv.Atoi(string(valueSource))
+	valueDestinationFloat, _ = strconv.Atoi(string(valueDestination))
 	var transferAmountFloat int
 	transferAmountFloat, _ = strconv.Atoi(transferAmount)
 	if valueSourceFloat < transferAmountFloat {
@@ -76,16 +76,16 @@ func transferMoney(sourceAccountHolderUserName string, destinationAccountHolderU
 
 		var sourceVarName = kernelTypes.String(sourceAccountHolderUserName)
 		var sourceValue = kernelTypes.String(strconv.Itoa(valueSourceFloat))
-		statusSource = altEthos.WriteVar(fdSource, sourceVarName, &sourceValue)
+		statusSource = altEthos.WriteVar(fdSource, string(sourceVarName), &sourceValue)
 		if statusSource != syscall.StatusOk {
-			log.Printf("Error writing to %v: %v\n", path+"datastore/"+sourceVarName, statusSource)
+			log.Printf("Error writing to %v: %v\n", path+"datastore/"+string(sourceVarName), statusSource)
 		}
 
 		var destinationVarName = kernelTypes.String(destinationAccountHolderUserName)
 		var destinationValue = kernelTypes.String(strconv.Itoa(valueDestinationFloat))
-		statusDestination = altEthos.WriteVar(fdDestination, destinationVarName, &destinationValue)
+		statusDestination = altEthos.WriteVar(fdDestination, string(destinationVarName), &destinationValue)
 		if statusDestination != syscall.StatusOk {
-			log.Printf("Error writing to %v: %v\n", path+"datastore/"+destinationVarName, statusDestination)
+			log.Printf("Error writing to %v: %v\n", path+"datastore/"+string(destinationVarName), statusDestination)
 		}
 
 		log.Printf("New source balance: %d\n", valueSourceFloat)
