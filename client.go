@@ -6,6 +6,7 @@ import (
 	"ethos/kernelTypes"
 	"ethos/syscall"
 	"log"
+	"strconv"
 )
 
 func init() {
@@ -16,22 +17,22 @@ func init() {
 
 func createAccountReply(status string) MyRpcProcedure {
 	if status == "Account created successfully" {
-		EthosSTDOUT("Account created successfully\n")
+		EthosSTDOUT(kernelTypes.String("Account created successfully\n"))
 	} else {
-		EthosSTDOUT("Unable to create account\n")
+		EthosSTDOUT(kernelTypes.String("Unable to create account\n"))
 	}
 	return nil
 }
 
 func getBalanceReply(balance string) MyRpcProcedure {
-	EthosSTDOUT("Balance: " + balance + "\n")
+	EthosSTDOUT(kernelTypes.String("Balance: " + balance + "\n"))
 	return nil
 }
 
 func transferMoneyReply(sourceBalance string, destinationBalance string) MyRpcProcedure {
-	EthosSTDOUT("New source balance: " + sourceBalance + "\n")
-	EthosSTDOUT("New destination balance: " + destinationBalance + "\n")
-	EthosSTDOUT("Transfer successful\n")
+	EthosSTDOUT(kernelTypes.String("New source balance: " + sourceBalance + "\n"))
+	EthosSTDOUT(kernelTypes.String("New destination balance: " + destinationBalance + "\n"))
+	EthosSTDOUT(kernelTypes.String("Transfer successful\n"))
 	return nil
 }
 
@@ -86,24 +87,24 @@ func menu() {
 		EthosSTDOUT("2. Get balance\n")
 		EthosSTDOUT("3. Transfer money\n")
 		EthosSTDOUT("4. Exit\n")
-		var input = EthosSTDIN()
+		var input = string(EthosSTDIN())
 		if input == "1\n" {
 			EthosSTDOUT("Enter a username: ")
-			var username = EthosSTDIN()
+			var username = string(EthosSTDIN())
 			EthosSTDOUT("Enter starting balance: ")
-			var balance = EthosSTDIN()
+			var balance, _ = strconv.ParseFloat(string(EthosSTDIN()), 32)
 			accountCreation(username, balance)
 		} else if input == "2\n" {
 			EthosSTDOUT("Enter a username: ")
-			var username = EthosSTDIN()
+			var username = string(EthosSTDIN())
 			balanceCheck(username)
 		} else if input == "3\n" {
 			EthosSTDOUT("Enter the source account username: ")
-			var source = EthosSTDIN()
+			var source = string(EthosSTDIN())
 			EthosSTDOUT("Enter the destination account username: ")
-			var destination = EthosSTDIN()
+			var destination = string(EthosSTDIN())
 			EthosSTDOUT("Enter transfer amount: ")
-			var amount = EthosSTDIN()
+			var amount, _ = strconv.ParseFloat(string(EthosSTDIN()), 32)
 			moneyTransfer(source, destination, amount)
 		} else if input == "4\n" {
 			break
