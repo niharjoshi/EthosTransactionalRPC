@@ -1,4 +1,4 @@
-package src
+package EthosTransactionalRPC
 
 import (
 	"ethos/altEthos"
