@@ -9,6 +9,7 @@ import (
 )
 
 var path = "/user/" + altEthos.GetUser() + "/server/"
+var eventFd = make(map[syscall.EventId]syscall.Fd)
 
 func init() {
 	SetupMyRpcCreateAccount(createAccount)
@@ -100,7 +101,7 @@ func CustomHandleImport(eventInfo altEthos.ImportEventInfo) {
 		log.Println("RPC stream read failed")
 		return
 	}
-	event_fd[event] = eventInfo.ReturnedFd
+	eventFd[event] = eventInfo.ReturnedFd
 	altEthos.PostEvent(event)
 	event, status = altEthos.ImportAsync(eventInfo.Fd, eventInfo.I, CustomHandleImport)
 	if status != syscall.StatusOk {
