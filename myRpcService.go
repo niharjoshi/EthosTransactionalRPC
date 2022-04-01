@@ -112,11 +112,11 @@ func CustomHandleImport(eventInfo altEthos.ImportEventInfo) {
 }
 
 func main() {
-	var pathService = altEthos.IsDirectory(path)
-	var pathClient = altEthos.IsDirectory("/home/me/EthosTransactionalRPC/client/")
-	var pathDatastore = altEthos.IsDirectory("/home/me/EthosTransactionalRPC/server/datastore/")
+	var pathService = path
+	var pathClient = "/home/me/EthosTransactionalRPC/client/"
+	var pathDatastore = "/home/me/EthosTransactionalRPC/server/datastore/"
 	var pathType kernelTypes.String
-	var checkPathService = altEthos.LogToDirectory(pathService)
+	var checkPathService = altEthos.IsDirectory(pathService)
 	if checkPathService == false {
 		log.Printf("Creating service logs directory\n")
 		var status1 = altEthos.DirectoryCreate(pathService, &pathType, "all")
@@ -125,7 +125,7 @@ func main() {
 			altEthos.Exit(status1)
 		}
 	}
-	var checkPathClient = altEthos.LogToDirectory(pathClient)
+	var checkPathClient = altEthos.IsDirectory(pathClient)
 	if checkPathClient == false {
 		log.Printf("Creating client logs directory\n")
 		var status2 = altEthos.DirectoryCreate(pathClient, &pathType, "all")
@@ -134,7 +134,7 @@ func main() {
 			altEthos.Exit(status2)
 		}
 	}
-	var checkPathDatastore = altEthos.LogToDirectory(pathDatastore)
+	var checkPathDatastore = altEthos.IsDirectory(pathDatastore)
 	if checkPathDatastore == false {
 		log.Printf("Creating datastore directory\n")
 		var status3 = altEthos.DirectoryCreate(pathDatastore, &pathType, "all")
