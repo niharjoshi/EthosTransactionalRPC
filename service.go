@@ -17,13 +17,13 @@ func init() {
 	SetupMyRpcTransferMoney(transferMoney)
 }
 
-func createAccount(accountHolderUserName string, startingBalance float64) MyRpcProcedure {
+func createAccount(accountHolderUserName string, startingBalance string) MyRpcProcedure {
 	fd, status := altEthos.DirectoryOpen(path + "datastore/")
 	if status != syscall.StatusOk {
 		log.Printf("Error fetching %v: %v\n", path+"datastore/", status)
 	}
 	var varName = kernelTypes.String(accountHolderUserName)
-	var value = kernelTypes.String(fmt.Sprintf("%f", startingBalance))
+	var value = kernelTypes.String(startingBalance)
 	status = altEthos.WriteVar(fd, varName, &value)
 	if status != syscall.StatusOk {
 		log.Printf("Error writing to %v: %v\n", path+"datastore/"+varName, status)
@@ -44,7 +44,7 @@ func getBalance(accountHolderUserName string) MyRpcProcedure {
 	return &MyRpcGetBalanceReply{string(value)}
 }
 
-func transferMoney(sourceAccountHolderUserName string, destinationAccountHolderUserName string, transferAmount float64) MyRpcProcedure {
+func transferMoney(sourceAccountHolderUserName string, destinationAccountHolderUserName string, transferAmount string) MyRpcProcedure {
 	fdSource, statusSource := altEthos.DirectoryOpen(path + "datastore/")
 	if statusSource != syscall.StatusOk {
 		log.Printf("Error fetching %v: %v\n", path+"datastore/", statusSource)
@@ -65,7 +65,6 @@ func transferMoney(sourceAccountHolderUserName string, destinationAccountHolderU
 	}
 	var valueSourceFloat float64
 	var valueDestinationFloat float64
-
 	valueSourceFloat, statusSource = strconv.ParseFloat(valueSource, 32)
 	if statusSource != nil {
 		log.Printf("Error converting source %v: %v\n", path+"datastore/"+sourceAccountHolderUserName, statusSource)
@@ -74,11 +73,13 @@ func transferMoney(sourceAccountHolderUserName string, destinationAccountHolderU
 	if statusSource != nil {
 		log.Printf("Error converting destination %v: %v\n", path+"datastore/"+destinationAccountHolderUserName, statusDestination)
 	}
-	if valueSourceFloat < transferAmount {
+	var transferAmountFloat float64
+	transferAmountFloat, _ = strconv.ParseFloat(transferAmount, 32)
+	if valueSourceFloat < transferAmountFloat {
 		log.Printf("Not enough balance for transfer\n")
 	} else {
-		valueSourceFloat -= transferAmount
-		valueDestinationFloat += transferAmount
+		valueSourceFloat -= transferAmountFloat
+		valueDestinationFloat += transferAmountFloat
 
 		var sourceVarName = kernelTypes.String(sourceAccountHolderUserName)
 		var sourceValue = kernelTypes.String(fmt.Sprintf("%f", valueSourceFloat))

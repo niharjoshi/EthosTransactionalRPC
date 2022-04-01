@@ -6,7 +6,6 @@ import (
 	"ethos/kernelTypes"
 	"ethos/syscall"
 	"log"
-	"strconv"
 )
 
 func init() {
@@ -36,7 +35,7 @@ func transferMoneyReply(sourceBalance string, destinationBalance string) MyRpcPr
 	return nil
 }
 
-func accountCreation(accountHolderUserName string, startingBalance float64) {
+func accountCreation(accountHolderUserName string, startingBalance string) {
 	call := MyRpcCreateAccount{accountHolderUserName, startingBalance}
 	ipcCall(&call)
 }
@@ -46,7 +45,7 @@ func balanceCheck(accountHolderUserName string) {
 	ipcCall(&call)
 }
 
-func moneyTransfer(sourceAccountHolderUserName string, destinationAccountHolderUserName string, transferAmount float64) {
+func moneyTransfer(sourceAccountHolderUserName string, destinationAccountHolderUserName string, transferAmount string) {
 	call := MyRpcTransferMoney{sourceAccountHolderUserName, destinationAccountHolderUserName, transferAmount}
 	ipcCall(&call)
 }
@@ -92,8 +91,7 @@ func menu() {
 			EthosSTDOUT("Enter a username: ")
 			var username = string(EthosSTDIN())
 			EthosSTDOUT("Enter starting balance: ")
-			var balanceStr = string(EthosSTDIN())
-			var balance, _ = strconv.ParseFloat(balanceStr, 32)
+			var balance = string(EthosSTDIN())
 			accountCreation(username, balance)
 		} else if input == "2\n" {
 			EthosSTDOUT("Enter a username: ")
@@ -105,8 +103,7 @@ func menu() {
 			EthosSTDOUT("Enter the destination account username: ")
 			var destination = string(EthosSTDIN())
 			EthosSTDOUT("Enter transfer amount: ")
-			var amountStr = string(EthosSTDIN())
-			var amount, _ = strconv.ParseFloat(amountStr, 32)
+			var amount = string(EthosSTDIN())
 			moneyTransfer(source, destination, amount)
 		} else if input == "4\n" {
 			break
