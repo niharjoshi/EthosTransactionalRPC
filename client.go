@@ -8,9 +8,9 @@ import (
 )
 
 func init() {
-	SetupCreateAccountReply(createAccountReply)
-	SetupGetBalanceReply(getBalanceReply)
-	SetupTransferMoneyReply(transferMoneyReply)
+	SetupMyRpcCreateAccountReply(createAccountReply)
+	SetupMyRpcGetBalanceReply(getBalanceReply)
+	SetupMyRpcTransferMoneyReply(transferMoneyReply)
 }
 
 func createAccountReply(status string) MyRpcProcedure {

@@ -12,9 +12,9 @@ import (
 var path = "/user/" + altEthos.GetUser() + "/server/"
 
 func init() {
-	SetupCreateAccount(createAccount)
-	SetupGetBalance(getBalance)
-	SetupTransferMoney(transferMoney)
+	SetupMyRpcCreateAccount(createAccount)
+	SetupMyRpcGetBalance(getBalance)
+	SetupMyRpcTransferMoney(transferMoney)
 }
 
 func createAccount(accountHolderUserName string, startingBalance float64) MyRpcProcedure {
