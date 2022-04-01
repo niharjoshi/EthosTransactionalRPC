@@ -21,10 +21,10 @@ all:  myRpcClient myRpcService
 myRpc.go: myRpc.t
 	$(ETN2GO) . myRpc main $^
 
-myRpcService: service.go myRpc.go
+myRpcService: myRpcService.go myRpc.go
 	ethosGo $^
 
-myRpcClient: client.go myRpc.go
+myRpcClient: myRpcClient.go myRpc.go
 	ethosGo $^
 
 # install types, service,
