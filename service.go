@@ -93,3 +93,56 @@ func transferMoney(sourceAccountHolderUserName string, destinationAccountHolderU
 	}
 	return &MyRpcTransferMoneyReply{strconv.Itoa(valueSourceFloat), strconv.Itoa(valueDestinationFloat)}
 }
+
+func CustomHandleImport(eventInfo altEthos.ImportEventInfo) {
+	event, status := altEthos.ReadRpcStreamAsync(eventInfo.ReturnedFd, eventInfo.I, altEthos.HandleRpc)
+	if status != syscall.StatusOk {
+		log.Println("RPC stream read failed")
+		return
+	}
+	event_fd[event] = eventInfo.ReturnedFd
+	altEthos.PostEvent(event)
+	event, status = altEthos.ImportAsync(eventInfo.Fd, eventInfo.I, CustomHandleImport)
+	if status != syscall.StatusOk {
+		log.Println("Async import failed")
+		return
+	}
+	altEthos.PostEvent(event)
+}
+
+func main() {
+	altEthos.LogToDirectory("log/server")
+	log.Printf("Starting RPC service\n")
+	listeningFd, status := altEthos.Advertise("myRpc")
+	if status != syscall.StatusOk {
+		log.Printf("Advertising service failed: %s\n", status)
+		altEthos.Exit(status)
+	}
+	var tree altEthos.EventTreeSlice
+	var next []syscall.EventId
+	t := MyRpc{}
+	event, status := altEthos.ImportAsync(listeningFd, &t, CustomHandleImport)
+	if status != syscall.StatusOk {
+		log.Println("Import failed")
+		return
+	}
+	next = append(next, event)
+	tree = altEthos.WaitTreeCreateOr(next)
+	for {
+		tree, _ = altEthos.Block(tree)
+		completed, pending := altEthos.GetTreeEvents(tree)
+		for _, eventId := range completed {
+			eventInfo, status := altEthos.OnComplete(eventId)
+			if status != syscall.StatusOk {
+				log.Println("OnComplete failed", eventInfo, status)
+				return
+			}
+			eventInfo.Do()
+		}
+		next = nil
+		next = append(next, pending...)
+		next = append(next, altEthos.RetrievePostedEvents()...)
+		tree = altEthos.WaitTreeCreateOr(next)
+	}
+	log.Printf("Shutting down RPC server\n")
+}
