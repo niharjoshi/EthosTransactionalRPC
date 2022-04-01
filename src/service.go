@@ -17,7 +17,7 @@ func init() {
 	SetupTransferMoney(transferMoney)
 }
 
-func createAccount(accountHolderUserName string, startingBalance float64) TransactionalProcedure {
+func createAccount(accountHolderUserName string, startingBalance float64) MyRpcProcedure {
 	fd, status := altEthos.DirectoryOpen(path + "datastore/")
 	if status != syscall.StatusOk {
 		log.Printf("Error fetching %v: %v\n", path+"datastore/", status)
@@ -31,7 +31,7 @@ func createAccount(accountHolderUserName string, startingBalance float64) Transa
 	return "Successfully created account"
 }
 
-func getBalance(accountHolderUserName string) TransactionalProcedure {
+func getBalance(accountHolderUserName string) MyRpcProcedure {
 	_, status := altEthos.DirectoryOpen(path + "datastore/")
 	if status != syscall.StatusOk {
 		log.Printf("Error fetching %v: %v\n", path+"datastore/", status)
@@ -44,7 +44,7 @@ func getBalance(accountHolderUserName string) TransactionalProcedure {
 	return "Balance: " + string(value)
 }
 
-func transferMoney(sourceAccountHolderUserName string, destinationAccountHolderUserName string, transferAmount float64) TransactionalProcedure {
+func transferMoney(sourceAccountHolderUserName string, destinationAccountHolderUserName string, transferAmount float64) MyRpcProcedure {
 	fdSource, statusSource := altEthos.DirectoryOpen(path + "datastore/")
 	if statusSource != syscall.StatusOk {
 		log.Printf("Error fetching %v: %v\n", path+"datastore/", statusSource)
