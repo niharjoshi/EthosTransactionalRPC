@@ -28,7 +28,7 @@ func createAccount(accountHolderUserName string, startingBalance float64) MyRpcP
 	if status != syscall.StatusOk {
 		log.Printf("Error writing to %v: %v\n", path+"datastore/"+varName, status)
 	}
-	return &MyRPCCreateAccountReply{"Account created successfully"}
+	return &MyRpcCreateAccountReply{"Account created successfully"}
 }
 
 func getBalance(accountHolderUserName string) MyRpcProcedure {
@@ -41,7 +41,7 @@ func getBalance(accountHolderUserName string) MyRpcProcedure {
 	if status != syscall.StatusOk {
 		log.Printf("Error reading %v: %v\n", path+"datastore/"+accountHolderUserName, status)
 	}
-	return &MyRPCGetBalanceReply{string(value)}
+	return &MyRpcGetBalanceReply{string(value)}
 }
 
 func transferMoney(sourceAccountHolderUserName string, destinationAccountHolderUserName string, transferAmount float64) MyRpcProcedure {
@@ -97,5 +97,5 @@ func transferMoney(sourceAccountHolderUserName string, destinationAccountHolderU
 		log.Printf("New source balance: %f\n", valueSourceFloat)
 		log.Printf("New destination balance: %f\n", valueDestinationFloat)
 	}
-	return &MyRPCTransferMoneyReply{fmt.Sprintf("%f", valueSourceFloat), fmt.Sprintf("%f", valueDestinationFloat)}
+	return &MyRpcTransferMoneyReply{fmt.Sprintf("%f", valueSourceFloat), fmt.Sprintf("%f", valueDestinationFloat)}
 }
