@@ -92,7 +92,8 @@ func menu() {
 			EthosSTDOUT("Enter a username: ")
 			var username = string(EthosSTDIN())
 			EthosSTDOUT("Enter starting balance: ")
-			var balance, _ = strconv.ParseFloat(string(EthosSTDIN()), 32)
+			var balanceStr = string(EthosSTDIN())
+			var balance, _ = strconv.ParseFloat(balanceStr, 32)
 			accountCreation(username, balance)
 		} else if input == "2\n" {
 			EthosSTDOUT("Enter a username: ")
@@ -104,7 +105,8 @@ func menu() {
 			EthosSTDOUT("Enter the destination account username: ")
 			var destination = string(EthosSTDIN())
 			EthosSTDOUT("Enter transfer amount: ")
-			var amount, _ = strconv.ParseFloat(string(EthosSTDIN()), 32)
+			var amountStr = string(EthosSTDIN())
+			var amount, _ = strconv.ParseFloat(amountStr, 32)
 			moneyTransfer(source, destination, amount)
 		} else if input == "4\n" {
 			break
