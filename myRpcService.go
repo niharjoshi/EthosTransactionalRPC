@@ -112,7 +112,37 @@ func CustomHandleImport(eventInfo altEthos.ImportEventInfo) {
 }
 
 func main() {
-	altEthos.LogToDirectory("log/server")
+	var pathService = altEthos.IsDirectory("/user/" + altEthos.GetUser() + "/server/")
+	var pathClient = altEthos.IsDirectory("/user/" + altEthos.GetUser() + "/client/")
+	var pathDatastore = altEthos.IsDirectory("/user/" + altEthos.GetUser() + "/datastore/")
+	var pathType kernelTypes.String
+	var checkPathService = altEthos.LogToDirectory(pathService)
+	if checkPathService == false {
+		log.Printf("Creating service logs directory\n")
+		var status1 = altEthos.DirectoryCreate(pathService, &pathType, "all")
+		if status1 != syscall.StatusOk {
+			log.Println("Service logs directory create failed: ", pathService, status1)
+			altEthos.Exit(status1)
+		}
+	}
+	var checkPathClient = altEthos.LogToDirectory(pathClient)
+	if checkPathClient == false {
+		log.Printf("Creating client logs directory\n")
+		var status2 = altEthos.DirectoryCreate(pathClient, &pathType, "all")
+		if status2 != syscall.StatusOk {
+			log.Println("Client logs directory create failed: ", pathClient, status2)
+			altEthos.Exit(status2)
+		}
+	}
+	var checkPathDatastore = altEthos.LogToDirectory(pathDatastore)
+	if checkPathDatastore == false {
+		log.Printf("Creating datastore directory\n")
+		var status3 = altEthos.DirectoryCreate(pathDatastore, &pathType, "all")
+		if status3 != syscall.StatusOk {
+			log.Println("Datastore directory create failed: ", pathDatastore, status3)
+			altEthos.Exit(status3)
+		}
+	}
 	log.Printf("Starting RPC service\n")
 	listeningFd, status := altEthos.Advertise("myRpc")
 	if status != syscall.StatusOk {

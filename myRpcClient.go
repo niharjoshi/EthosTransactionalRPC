@@ -114,7 +114,7 @@ func menu() {
 }
 
 func main() {
-	altEthos.LogToDirectory("log/client")
+	altEthos.LogToDirectory("/user/" + altEthos.GetUser() + "/client/")
 	log.Printf("Starting RPC client\n")
 	menu()
 	log.Printf("Shutting down RPC client\n")
