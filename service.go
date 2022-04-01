@@ -4,7 +4,6 @@ import (
 	"ethos/altEthos"
 	"ethos/kernelTypes"
 	"ethos/syscall"
-	"fmt"
 	"log"
 	"strconv"
 )
@@ -22,7 +21,7 @@ func createAccount(accountHolderUserName string, startingBalance string) MyRpcPr
 	if status != syscall.StatusOk {
 		log.Printf("Error fetching %v: %v\n", path+"datastore/", status)
 	}
-	var varName = kernelTypes.String(accountHolderUserName)
+	var varName = accountHolderUserName
 	var value = kernelTypes.String(startingBalance)
 	status = altEthos.WriteVar(fd, varName, &value)
 	if status != syscall.StatusOk {
@@ -63,18 +62,18 @@ func transferMoney(sourceAccountHolderUserName string, destinationAccountHolderU
 	if statusSource != syscall.StatusOk {
 		log.Printf("Error reading destination %v: %v\n", path+"datastore/"+destinationAccountHolderUserName, statusDestination)
 	}
-	var valueSourceFloat float64
-	var valueDestinationFloat float64
-	valueSourceFloat, statusSource = strconv.ParseFloat(valueSource, 32)
+	var valueSourceFloat int
+	var valueDestinationFloat int
+	valueSourceFloat, statusSource = strconv.Atoi(valueSource)
 	if statusSource != nil {
 		log.Printf("Error converting source %v: %v\n", path+"datastore/"+sourceAccountHolderUserName, statusSource)
 	}
-	valueDestinationFloat, statusDestination = strconv.ParseFloat(valueDestination, 32)
+	valueDestinationFloat, statusDestination = strconv.Atoi(valueDestination)
 	if statusSource != nil {
 		log.Printf("Error converting destination %v: %v\n", path+"datastore/"+destinationAccountHolderUserName, statusDestination)
 	}
-	var transferAmountFloat float64
-	transferAmountFloat, _ = strconv.ParseFloat(transferAmount, 32)
+	var transferAmountFloat int
+	transferAmountFloat, _ = strconv.Atoi(transferAmount)
 	if valueSourceFloat < transferAmountFloat {
 		log.Printf("Not enough balance for transfer\n")
 	} else {
@@ -82,21 +81,21 @@ func transferMoney(sourceAccountHolderUserName string, destinationAccountHolderU
 		valueDestinationFloat += transferAmountFloat
 
 		var sourceVarName = kernelTypes.String(sourceAccountHolderUserName)
-		var sourceValue = kernelTypes.String(fmt.Sprintf("%f", valueSourceFloat))
+		var sourceValue = kernelTypes.String(strconv.Itoa(valueSourceFloat))
 		statusSource = altEthos.WriteVar(fdSource, sourceVarName, &sourceValue)
 		if statusSource != syscall.StatusOk {
 			log.Printf("Error writing to %v: %v\n", path+"datastore/"+sourceVarName, statusSource)
 		}
 
 		var destinationVarName = kernelTypes.String(destinationAccountHolderUserName)
-		var destinationValue = kernelTypes.String(fmt.Sprintf("%f", valueDestinationFloat))
+		var destinationValue = kernelTypes.String(strconv.Itoa(valueDestinationFloat))
 		statusDestination = altEthos.WriteVar(fdDestination, destinationVarName, &destinationValue)
 		if statusDestination != syscall.StatusOk {
 			log.Printf("Error writing to %v: %v\n", path+"datastore/"+destinationVarName, statusDestination)
 		}
 
-		log.Printf("New source balance: %f\n", valueSourceFloat)
-		log.Printf("New destination balance: %f\n", valueDestinationFloat)
+		log.Printf("New source balance: %d\n", valueSourceFloat)
+		log.Printf("New destination balance: %d\n", valueDestinationFloat)
 	}
-	return &MyRpcTransferMoneyReply{fmt.Sprintf("%f", valueSourceFloat), fmt.Sprintf("%f", valueDestinationFloat)}
+	return &MyRpcTransferMoneyReply{strconv.Itoa(valueSourceFloat), strconv.Itoa(valueDestinationFloat)}
 }
