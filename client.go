@@ -1,4 +1,4 @@
-package EthosTransactionalRPC
+package main
 
 import (
 	"ethos/altEthos"
@@ -87,7 +87,7 @@ func menu() {
 			var destination = EthosSTDIN()
 			EthosSTDOUT("Enter transfer amount: ")
 			var amount = EthosSTDIN()
-			transferMoney(source, destination, amount)
+			moneyTransfer(source, destination, amount)
 		} else if input == "4\n" {
 			break
 		} else {
