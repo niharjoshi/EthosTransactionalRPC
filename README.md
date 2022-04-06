@@ -18,7 +18,7 @@ make install
 cd server
 sudo -E ethosRun
 ```
-- Open a new terminal window and run the commands below to start the RPC client
+- Open a second terminal window and run the commands below to start the RPC client
 ```console
 cd server
 etAl server.ethos
