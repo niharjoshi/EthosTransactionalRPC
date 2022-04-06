@@ -20,7 +20,7 @@ sudo -E ethosRun
 ```
 - Open a second terminal window and run the commands below to start the RPC client
 ```console
-cd server
+cd EthosTransactionalRPC/server
 etAl server.ethos
 cd /programs
 myRpcClient
