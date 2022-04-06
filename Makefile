@@ -33,8 +33,8 @@ install: clean myRpcClient myRpcService
 	ethosTypeInstall myRpc
 	ethosDirCreate $(ETHOSROOT)/services/myRpc   $(ETHOSROOT)/types/spec/myRpc/MyRpc all
 	install -D  myRpcService myRpcClient         $(ETHOSROOT)/programs
-	ethosStringEncode /programs/myRpcService    > $(ETHOSROOT)/etc/init/services/myRpcService
-
+	ethosStringEncode /programs/myRpcService     > $(ETHOSROOT)/etc/init/services/myRpcService
+	ethosStringEncode /programs/myRpcClient      > $(ETHOSROOT)/etc/init/services/myRpcClient
 
 # remove build artifacts
 clean:
