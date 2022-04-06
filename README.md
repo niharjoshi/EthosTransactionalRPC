@@ -1,8 +1,8 @@
 # CS 587 Assignment 1
 
-- [x] Name: Nihar Shailesh Joshi
-- [x] NetID: njoshi27@uic.edu
-- [x] UIN: 677063712
+- Name: Nihar Shailesh Joshi
+- NetID: njoshi27@uic.edu
+- UIN: 677063712
 
 
 ## Instructions
