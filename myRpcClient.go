@@ -14,24 +14,32 @@ func init() {
 	SetupMyRpcTransferMoneyReply(transferMoneyReply)
 }
 
-func createAccountReply(status string) MyRpcProcedure {
-	if status == "Account created successfully" {
+func createAccountReply(message string, status syscall.Status) MyRpcProcedure {
+	if status == syscall.StatusOk {
 		EthosSTDOUT(kernelTypes.String("Account created successfully\n"))
 	} else {
-		EthosSTDOUT(kernelTypes.String("Unable to create account\n"))
+		EthosSTDOUT(kernelTypes.String(message + "\n"))
 	}
 	return nil
 }
 
-func getBalanceReply(balance string) MyRpcProcedure {
-	EthosSTDOUT(kernelTypes.String("Balance: " + balance + "\n"))
+func getBalanceReply(balance string, message string, status syscall.Status) MyRpcProcedure {
+	if status == syscall.StatusOk {
+		EthosSTDOUT(kernelTypes.String("Balance: " + balance + "\n"))
+	} else {
+		EthosSTDOUT(kernelTypes.String(message + "\n"))
+	}
 	return nil
 }
 
-func transferMoneyReply(sourceBalance string, destinationBalance string) MyRpcProcedure {
-	EthosSTDOUT(kernelTypes.String("New source balance: " + sourceBalance + "\n"))
-	EthosSTDOUT(kernelTypes.String("New destination balance: " + destinationBalance + "\n"))
-	EthosSTDOUT(kernelTypes.String("Transfer successful\n"))
+func transferMoneyReply(sourceBalance string, destinationBalance string, message string, status syscall.Status) MyRpcProcedure {
+	if status == syscall.StatusOk {
+		EthosSTDOUT(kernelTypes.String("New source balance: " + sourceBalance + "\n"))
+		EthosSTDOUT(kernelTypes.String("New destination balance: " + destinationBalance + "\n"))
+		EthosSTDOUT(kernelTypes.String("Transfer successful\n"))
+	} else {
+		EthosSTDOUT(kernelTypes.String(message + "\n"))
+	}
 	return nil
 }
 

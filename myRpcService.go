@@ -21,47 +21,55 @@ func createAccount(accountHolderUserName string, startingBalance string) MyRpcPr
 	fd, status := altEthos.DirectoryOpen(path + "datastore/")
 	if status != syscall.StatusOk {
 		log.Printf("Error fetching %v: %v\n", path+"datastore/", status)
+		return &MyRpcCreateAccountReply{"Unable to open datastore", syscall.StatusFail}
 	}
 	var varName = accountHolderUserName
 	var value = kernelTypes.String(startingBalance)
 	status = altEthos.WriteVar(fd, varName, &value)
 	if status != syscall.StatusOk {
 		log.Printf("Error writing to %v: %v\n", path+"datastore/"+varName, status)
+		return &MyRpcCreateAccountReply{"Unable to create account", syscall.StatusFail}
 	}
-	return &MyRpcCreateAccountReply{"Account created successfully"}
+	return &MyRpcCreateAccountReply{"Account created successfully", syscall.StatusOk}
 }
 
 func getBalance(accountHolderUserName string) MyRpcProcedure {
 	_, status := altEthos.DirectoryOpen(path + "datastore/")
 	if status != syscall.StatusOk {
 		log.Printf("Error fetching %v: %v\n", path+"datastore/", status)
+		return &MyRpcCreateAccountReply{"", "Unable to open datastore", syscall.StatusFail}
 	}
 	var value kernelTypes.String
 	status = altEthos.Read(path+"datastore/"+accountHolderUserName, &value)
 	if status != syscall.StatusOk {
 		log.Printf("Error reading %v: %v\n", path+"datastore/"+accountHolderUserName, status)
+		return &MyRpcGetBalanceReply{"", "Unable to locate account", syscall.StatusFail}
 	}
-	return &MyRpcGetBalanceReply{string(value)}
+	return &MyRpcGetBalanceReply{string(value), "Balance fetched successfully", syscall.StatusOk}
 }
 
 func transferMoney(sourceAccountHolderUserName string, destinationAccountHolderUserName string, transferAmount string) MyRpcProcedure {
 	fdSource, statusSource := altEthos.DirectoryOpen(path + "datastore/")
 	if statusSource != syscall.StatusOk {
 		log.Printf("Error fetching %v: %v\n", path+"datastore/", statusSource)
+		return &MyRpcCreateAccountReply{"", "", "Unable to open datastore", syscall.StatusFail}
 	}
 	var valueSource kernelTypes.String
 	statusSource = altEthos.Read(path+"datastore/"+sourceAccountHolderUserName, &valueSource)
 	if statusSource != syscall.StatusOk {
 		log.Printf("Error reading source %v: %v\n", path+"datastore/"+sourceAccountHolderUserName, statusSource)
+		return &MyRpcCreateAccountReply{"", "", "Unable to locate source account", syscall.StatusFail}
 	}
 	fdDestination, statusDestination := altEthos.DirectoryOpen(path + "datastore/")
 	if statusDestination != syscall.StatusOk {
 		log.Printf("Error fetching %v: %v\n", path+"datastore/", statusDestination)
+		return &MyRpcCreateAccountReply{"", "", "Unable to open datastore", syscall.StatusFail}
 	}
 	var valueDestination kernelTypes.String
 	statusDestination = altEthos.Read(path+"datastore/"+destinationAccountHolderUserName, &valueDestination)
 	if statusSource != syscall.StatusOk {
 		log.Printf("Error reading destination %v: %v\n", path+"datastore/"+destinationAccountHolderUserName, statusDestination)
+		return &MyRpcCreateAccountReply{"", "", "Unable to locate destination account", syscall.StatusFail}
 	}
 	var valueSourceFloat int
 	var valueDestinationFloat int
@@ -71,6 +79,7 @@ func transferMoney(sourceAccountHolderUserName string, destinationAccountHolderU
 	transferAmountFloat, _ = strconv.Atoi(transferAmount)
 	if valueSourceFloat < transferAmountFloat {
 		log.Printf("Not enough balance for transfer\n")
+		return &MyRpcCreateAccountReply{"", "", "Not enough balance for successful transfer", syscall.StatusFail}
 	} else {
 		valueSourceFloat -= transferAmountFloat
 		valueDestinationFloat += transferAmountFloat
@@ -80,19 +89,20 @@ func transferMoney(sourceAccountHolderUserName string, destinationAccountHolderU
 		statusSource = altEthos.WriteVar(fdSource, string(sourceVarName), &sourceValue)
 		if statusSource != syscall.StatusOk {
 			log.Printf("Error writing to %v: %v\n", path+"datastore/"+string(sourceVarName), statusSource)
+			return &MyRpcCreateAccountReply{"", "", "Unable to transfer money from source account", syscall.StatusFail}
 		}
-
 		var destinationVarName = kernelTypes.String(destinationAccountHolderUserName)
 		var destinationValue = kernelTypes.String(strconv.Itoa(valueDestinationFloat))
 		statusDestination = altEthos.WriteVar(fdDestination, string(destinationVarName), &destinationValue)
 		if statusDestination != syscall.StatusOk {
 			log.Printf("Error writing to %v: %v\n", path+"datastore/"+string(destinationVarName), statusDestination)
+			return &MyRpcCreateAccountReply{"", "", "Unable to transfer money from destination account", syscall.StatusFail}
 		}
 
 		log.Printf("New source balance: %d\n", valueSourceFloat)
 		log.Printf("New destination balance: %d\n", valueDestinationFloat)
 	}
-	return &MyRpcTransferMoneyReply{strconv.Itoa(valueSourceFloat), strconv.Itoa(valueDestinationFloat)}
+	return &MyRpcTransferMoneyReply{strconv.Itoa(valueSourceFloat), strconv.Itoa(valueDestinationFloat), "Transfer completed successfully", syscall.StatusOk}
 }
 
 func CustomHandleImport(eventInfo altEthos.ImportEventInfo) {
