@@ -97,7 +97,7 @@ func menu() {
 	if status != syscall.StatusOk {
 		log.Printf("Main menu - error while reading syscall.Stdin: %v\n", status)
 	}
-	handler(userInput)
+	handler(string(userInput))
 }
 
 func handler(userInput string) {
