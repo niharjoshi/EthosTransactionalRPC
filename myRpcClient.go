@@ -14,7 +14,7 @@ func init() {
 	SetupMyRpcTransferMoneyReply(transferMoneyReply)
 }
 
-func createAccountReply(message string, status syscall.Status) MyRpcProcedure {
+func createAccountReply(message string, status syscall.Status) (MyRpcProcedure) {
 	if status == syscall.StatusOk {
 		EthosSTDOUT(kernelTypes.String("Account created successfully\n"))
 	} else {
@@ -23,7 +23,7 @@ func createAccountReply(message string, status syscall.Status) MyRpcProcedure {
 	return nil
 }
 
-func getBalanceReply(balance string, message string, status syscall.Status) MyRpcProcedure {
+func getBalanceReply(balance string, message string, status syscall.Status) (MyRpcProcedure) {
 	if status == syscall.StatusOk {
 		EthosSTDOUT(kernelTypes.String("Balance: " + balance + "\n"))
 	} else {
@@ -32,7 +32,7 @@ func getBalanceReply(balance string, message string, status syscall.Status) MyRp
 	return nil
 }
 
-func transferMoneyReply(sourceBalance string, destinationBalance string, message string, status syscall.Status) MyRpcProcedure {
+func transferMoneyReply(sourceBalance string, destinationBalance string, message string, status syscall.Status) (MyRpcProcedure) {
 	if status == syscall.StatusOk {
 		EthosSTDOUT(kernelTypes.String("New source balance: " + sourceBalance + "\n"))
 		EthosSTDOUT(kernelTypes.String("New destination balance: " + destinationBalance + "\n"))
