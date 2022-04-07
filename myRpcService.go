@@ -27,19 +27,19 @@ func createAccount(accountHolderUserName string, startingBalance string) MyRpcPr
 	} else {
 		log.Println("Account already exists with balance " + value)
 		datastore[accountHolderUserName] = startingBalance
-		return &MyRpcCreateAccountReply{"Account created successfully", syscall.StatusOk}
 	}
+	return &MyRpcCreateAccountReply{"Account created successfully", syscall.StatusOk}
 }
 
 func getBalance(accountHolderUserName string) MyRpcProcedure {
 	value, ok := datastore[accountHolderUserName]
 	if ok {
 		log.Println("Account has a balance of " + value)
-		return &MyRpcGetBalanceReply{value, "Balance fetched successfully", syscall.StatusOk}
 	} else {
 		log.Println("Account does not exist")
 		return &MyRpcGetBalanceReply{"Null", "Account does not exist", syscall.StatusFail}
 	}
+	return &MyRpcGetBalanceReply{value, "Balance fetched successfully", syscall.StatusOk}
 }
 
 func transferMoney(sourceAccountHolderUserName string, destinationAccountHolderUserName string, transferAmount string) MyRpcProcedure {
@@ -71,8 +71,8 @@ func transferMoney(sourceAccountHolderUserName string, destinationAccountHolderU
 		datastore[destinationAccountHolderUserName] = valueDestination
 		log.Println("New source balance: " + valueSource)
 		log.Println("New destination balance: " + valueDestination)
-		return &MyRpcTransferMoneyReply{valueSource, valueDestination, "Transfer completed successfully", syscall.StatusOk}
 	}
+	return &MyRpcTransferMoneyReply{valueSource, valueDestination, "Transfer completed successfully", syscall.StatusOk}
 }
 
 func CustomHandleImport(eventInfo altEthos.ImportEventInfo) {
