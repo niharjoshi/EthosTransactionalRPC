@@ -14,7 +14,7 @@ func init() {
 	SetupMyRpcTransferMoneyReply(transferMoneyReply)
 }
 
-func createAccountReply(message string, status syscall.Status) (MyRpcProcedure) {
+func createAccountReply(message string, status syscall.Status) MyRpcProcedure {
 	if status == syscall.StatusOk {
 		EthosSTDOUT(kernelTypes.String("Account created successfully\n"))
 	} else {
@@ -23,7 +23,7 @@ func createAccountReply(message string, status syscall.Status) (MyRpcProcedure) 
 	return nil
 }
 
-func getBalanceReply(balance string, message string, status syscall.Status) (MyRpcProcedure) {
+func getBalanceReply(balance string, message string, status syscall.Status) MyRpcProcedure {
 	if status == syscall.StatusOk {
 		EthosSTDOUT(kernelTypes.String("Balance: " + balance + "\n"))
 	} else {
@@ -32,7 +32,7 @@ func getBalanceReply(balance string, message string, status syscall.Status) (MyR
 	return nil
 }
 
-func transferMoneyReply(sourceBalance string, destinationBalance string, message string, status syscall.Status) (MyRpcProcedure) {
+func transferMoneyReply(sourceBalance string, destinationBalance string, message string, status syscall.Status) MyRpcProcedure {
 	if status == syscall.StatusOk {
 		EthosSTDOUT(kernelTypes.String("New source balance: " + sourceBalance + "\n"))
 		EthosSTDOUT(kernelTypes.String("New destination balance: " + destinationBalance + "\n"))
@@ -88,36 +88,40 @@ func EthosSTDOUT(prompt kernelTypes.String) {
 }
 
 func menu() {
-	for {
-		EthosSTDOUT("Options:\n")
-		EthosSTDOUT("1. Create account\n")
-		EthosSTDOUT("2. Get balance\n")
-		EthosSTDOUT("3. Transfer money\n")
-		EthosSTDOUT("4. Exit\n")
-		var input = string(EthosSTDIN())
-		if input == "1\n" {
-			EthosSTDOUT("Enter a username: ")
-			var username = string(EthosSTDIN())
-			EthosSTDOUT("Enter starting balance: ")
-			var balance = string(EthosSTDIN())
-			accountCreation(username, balance)
-		} else if input == "2\n" {
-			EthosSTDOUT("Enter a username: ")
-			var username = string(EthosSTDIN())
-			balanceCheck(username)
-		} else if input == "3\n" {
-			EthosSTDOUT("Enter the source account username: ")
-			var source = string(EthosSTDIN())
-			EthosSTDOUT("Enter the destination account username: ")
-			var destination = string(EthosSTDIN())
-			EthosSTDOUT("Enter transfer amount: ")
-			var amount = string(EthosSTDIN())
-			moneyTransfer(source, destination, amount)
-		} else if input == "4\n" {
-			break
-		} else {
-			EthosSTDOUT("Wrong input, try again.\n")
-		}
+	EthosSTDOUT("Options:\n")
+	EthosSTDOUT("1. Create account\n")
+	EthosSTDOUT("2. Get balance\n")
+	EthosSTDOUT("3. Transfer money\n")
+	var userInput kernelTypes.String
+	status := altEthos.ReadStream(syscall.Stdin, &userInput)
+	if status != syscall.StatusOk {
+		log.Printf("Main menu - error while reading syscall.Stdin: %v\n", status)
+	}
+	handler(userInput)
+}
+
+func handler(userInput string) {
+	switch userInput {
+	case "1\n":
+		EthosSTDOUT("Enter a username: ")
+		var username = string(EthosSTDIN())
+		EthosSTDOUT("Enter starting balance: ")
+		var balance = string(EthosSTDIN())
+		accountCreation(username, balance)
+	case "2\n":
+		EthosSTDOUT("Enter a username: ")
+		var username = string(EthosSTDIN())
+		balanceCheck(username)
+	case "3\n":
+		EthosSTDOUT("Enter the source account username: ")
+		var source = string(EthosSTDIN())
+		EthosSTDOUT("Enter the destination account username: ")
+		var destination = string(EthosSTDIN())
+		EthosSTDOUT("Enter transfer amount: ")
+		var amount = string(EthosSTDIN())
+		moneyTransfer(source, destination, amount)
+	default:
+		EthosSTDOUT("Wrong input, try again.\n")
 	}
 }
 
