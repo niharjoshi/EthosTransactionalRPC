@@ -19,7 +19,7 @@ func init() {
 	SetupMyRpcTransferMoney(transferMoney)
 }
 
-func createAccount(accountHolderUserName string, startingBalance string) MyRpcProcedure {
+func createAccount(accountHolderUserName string, startingBalance string) (MyRpcProcedure) {
 	value, ok := datastore[accountHolderUserName]
 	if ok {
 		log.Println("Account already exists")
@@ -31,7 +31,7 @@ func createAccount(accountHolderUserName string, startingBalance string) MyRpcPr
 	return &MyRpcCreateAccountReply{"Account created successfully", syscall.StatusOk}
 }
 
-func getBalance(accountHolderUserName string) MyRpcProcedure {
+func getBalance(accountHolderUserName string) (MyRpcProcedure) {
 	value, ok := datastore[accountHolderUserName]
 	if ok {
 		log.Println("Account has a balance of " + value)
@@ -42,7 +42,7 @@ func getBalance(accountHolderUserName string) MyRpcProcedure {
 	return &MyRpcGetBalanceReply{value, "Balance fetched successfully", syscall.StatusOk}
 }
 
-func transferMoney(sourceAccountHolderUserName string, destinationAccountHolderUserName string, transferAmount string) MyRpcProcedure {
+func transferMoney(sourceAccountHolderUserName string, destinationAccountHolderUserName string, transferAmount string) (MyRpcProcedure) {
 	valueSource, okSource := datastore[sourceAccountHolderUserName]
 	if !okSource {
 		log.Println("Source account does not exist")
