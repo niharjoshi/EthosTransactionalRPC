@@ -2,7 +2,6 @@ package main
 
 import (
 	"ethos/altEthos"
-	"ethos/kernelTypes"
 	"ethos/syscall"
 	"log"
 	"strconv"
@@ -19,7 +18,7 @@ func init() {
 	SetupMyRpcTransferMoney(transferMoney)
 }
 
-func createAccount(accountHolderUserName string, startingBalance string) (MyRpcProcedure) {
+func createAccount(accountHolderUserName string, startingBalance string) MyRpcProcedure {
 	value, ok := datastore[accountHolderUserName]
 	if ok {
 		log.Println("Account already exists")
@@ -31,7 +30,7 @@ func createAccount(accountHolderUserName string, startingBalance string) (MyRpcP
 	return &MyRpcCreateAccountReply{"Account created successfully", syscall.StatusOk}
 }
 
-func getBalance(accountHolderUserName string) (MyRpcProcedure) {
+func getBalance(accountHolderUserName string) MyRpcProcedure {
 	value, ok := datastore[accountHolderUserName]
 	if ok {
 		log.Println("Account has a balance of " + value)
@@ -42,7 +41,7 @@ func getBalance(accountHolderUserName string) (MyRpcProcedure) {
 	return &MyRpcGetBalanceReply{value, "Balance fetched successfully", syscall.StatusOk}
 }
 
-func transferMoney(sourceAccountHolderUserName string, destinationAccountHolderUserName string, transferAmount string) (MyRpcProcedure) {
+func transferMoney(sourceAccountHolderUserName string, destinationAccountHolderUserName string, transferAmount string) MyRpcProcedure {
 	valueSource, okSource := datastore[sourceAccountHolderUserName]
 	if !okSource {
 		log.Println("Source account does not exist")
@@ -75,85 +74,25 @@ func transferMoney(sourceAccountHolderUserName string, destinationAccountHolderU
 	return &MyRpcTransferMoneyReply{valueSource, valueDestination, "Transfer completed successfully", syscall.StatusOk}
 }
 
-func CustomHandleImport(eventInfo altEthos.ImportEventInfo) {
-	event, status := altEthos.ReadRpcStreamAsync(eventInfo.ReturnedFd, eventInfo.I, altEthos.HandleRpc)
-	if status != syscall.StatusOk {
-		log.Println("RPC stream read failed")
-		return
-	}
-	eventFd[event] = eventInfo.ReturnedFd
-	altEthos.PostEvent(event)
-	event, status = altEthos.ImportAsync(eventInfo.Fd, eventInfo.I, CustomHandleImport)
-	if status != syscall.StatusOk {
-		log.Println("Async import failed")
-		return
-	}
-	altEthos.PostEvent(event)
-}
-
 func main() {
-	var pathService = path
-	var pathClient = "/home/me/EthosTransactionalRPC/client/"
-	var pathDatastore = "/home/me/EthosTransactionalRPC/server/datastore/"
-	var pathType kernelTypes.String
-	var checkPathService = altEthos.IsDirectory(pathService)
-	if checkPathService == false {
-		log.Printf("Creating service logs directory\n")
-		var status1 = altEthos.DirectoryCreate(pathService, &pathType, "all")
-		if status1 != syscall.StatusOk {
-			log.Println("Service logs directory create failed: ", pathService, status1)
-			altEthos.Exit(status1)
-		}
+	statusLogs := altEthos.LogToDirectory("/home/me/EthosTransactionalRPC/server/")
+	if statusLogs != syscall.StatusOk {
+		log.Printf("Service logs directory create failed: %v\n", statusLogs)
+		altEthos.Exit(statusLogs)
 	}
-	var checkPathClient = altEthos.IsDirectory(pathClient)
-	if checkPathClient == false {
-		log.Printf("Creating client logs directory\n")
-		var status2 = altEthos.DirectoryCreate(pathClient, &pathType, "all")
-		if status2 != syscall.StatusOk {
-			log.Println("Client logs directory create failed: ", pathClient, status2)
-			altEthos.Exit(status2)
-		}
-	}
-	var checkPathDatastore = altEthos.IsDirectory(pathDatastore)
-	if checkPathDatastore == false {
-		log.Printf("Creating datastore directory\n")
-		var status3 = altEthos.DirectoryCreate(pathDatastore, &pathType, "all")
-		if status3 != syscall.StatusOk {
-			log.Println("Datastore directory create failed: ", pathDatastore, status3)
-			altEthos.Exit(status3)
-		}
-	}
-	log.Printf("Starting RPC service\n")
 	listeningFd, status := altEthos.Advertise("myRpc")
 	if status != syscall.StatusOk {
-		log.Printf("Advertising service failed: %s\n", status)
+		log.Printf("Advertising service failed: %s \n", status)
 		altEthos.Exit(status)
 	}
-	var tree altEthos.EventTreeSlice
-	var next []syscall.EventId
-	t := MyRpc{}
-	event, status := altEthos.ImportAsync(listeningFd, &t, CustomHandleImport)
-	if status != syscall.StatusOk {
-		log.Println("Import failed")
-		return
-	}
-	next = append(next, event)
-	tree = altEthos.WaitTreeCreateOr(next)
 	for {
-		tree, _ = altEthos.Block(tree)
-		completed, pending := altEthos.GetTreeEvents(tree)
-		for _, eventId := range completed {
-			eventInfo, status := altEthos.OnComplete(eventId)
-			if status != syscall.StatusOk {
-				log.Println("OnComplete failed", eventInfo, status)
-				return
-			}
-			eventInfo.Do()
+		_, fd, statusEvent := altEthos.Import(listeningFd)
+		if statusEvent != syscall.StatusOk {
+			log.Printf("Error calling import: %v\n", statusEvent)
+			altEthos.Exit(statusEvent)
 		}
-		next = nil
-		next = append(next, pending...)
-		next = append(next, altEthos.RetrievePostedEvents()...)
-		tree = altEthos.WaitTreeCreateOr(next)
+		log.Printf("Server: new client connection accepted\n")
+		t := MyRpc{}
+		altEthos.Handle(fd, &t)
 	}
-	log.Printf("Shutting down RPC server\n")
 }
